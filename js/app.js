@@ -201,6 +201,7 @@ function applyLanguage() {
   document.documentElement.dir = lang.dir;
   document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T(el.dataset.t); });
   $("searchInput").placeholder = T("searchPlaceholder");
+  document.title = T("appTitle");
 }
 
 function renderChips() {

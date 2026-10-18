@@ -33,6 +33,7 @@ header{display:flex;flex-direction:column;gap:4px}
 .brand img{width:44px;height:44px;border-radius:11px;flex:none}
 .hijri{color:var(--muted);font-size:13.5px}
 [dir="rtl"] .eyebrow{letter-spacing:0}
+[dir="rtl"] h1{font-family:var(--arabic);letter-spacing:0}
 
 .next{background:var(--card);color:var(--oncard);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:end}
 .next .lbl{grid-column:1/-1;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}

@@ -1,0 +1,5 @@
+node_modules/
+worker/.wrangler/
+worker/.dev.vars
+_site/
+.DS_Store

@@ -1,0 +1,17 @@
+name = "gebetszeiten-push"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+ALLOWED_ORIGINS = "https://khalid-ude.github.io"
+VAPID_SUBJECT = "https://github.com/Khalid-UDE/Gebetszeiten"
+
+# database_id wird von scripts/setup.mjs automatisch eingetragen
+[[d1_databases]]
+binding = "DB"
+database_name = "gebetszeiten"
+database_id = "00000000-0000-0000-0000-000000000000"

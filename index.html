@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gebetszeiten</title>
+<meta name="description" content="Gebetszeiten für deinen Standort – mit Benachrichtigungen, Muslim World League oder offiziellen Diyanet-Zeiten.">
+<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121615" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gebetszeiten">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Erster Start: Erlaubnisse -->
+  <section id="onboarding" class="onboarding" hidden>
+    <div class="ob-head">
+      <img src="icons/icon.svg" alt="" width="72" height="72" class="ob-icon">
+      <h1 data-t="welcome">Willkommen</h1>
+      <p class="muted" data-t="welcomeText"></p>
+    </div>
+    <div class="panel ob-card">
+      <div class="ob-row">
+        <span class="ob-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <span><strong data-t="location">Standort</strong><span class="small muted" data-t="locationWhy"></span></span>
+      </div>
+      <button type="button" class="btn primary" id="obLocation" data-t="allowLocation">Standort erlauben</button>
+      <button type="button" class="btn link" id="obManual" data-t="manualInstead">Ort lieber manuell suchen</button>
+      <p class="small ok" id="obLocationState" hidden></p>
+    </div>
+    <div class="panel ob-card">
+      <div class="ob-row">
+        <span class="ob-ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+        <span><strong data-t="notifications">Benachrichtigungen</strong><span class="small muted" data-t="notifWhy"></span></span>
+      </div>
+      <button type="button" class="btn outline" id="obNotif" data-t="notifEnable">Benachrichtigungen erlauben</button>
+      <p class="small muted" id="obNotifState" hidden></p>
+    </div>
+    <p class="hint small" data-ios-hint data-t="iosHint" hidden></p>
+    <button type="button" class="btn link muted" id="obDone" data-t="later">Später</button>
+  </section>
+
+  <!-- Hauptansicht -->
+  <main id="main" hidden>
+    <header>
+      <div class="eyebrow" id="today"></div>
+      <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1>Gebetszeiten</h1></div>
+      <div class="hijri" id="hijri"></div>
+    </header>
+
+    <section class="next" aria-live="polite">
+      <span class="lbl" id="nextLbl"></span>
+      <span class="name" id="nextName">–</span>
+      <span class="time" id="nextTime">–</span>
+      <span class="cd" id="nextCd"></span>
+    </section>
+
+    <section class="panel" aria-labelledby="h-today">
+      <div class="panel-head">
+        <h2 id="h-today" data-t="today">Heute</h2>
+        <span class="src" id="locSummary"></span>
+      </div>
+      <ul class="times" id="times"></ul>
+    </section>
+
+    <section class="panel" aria-labelledby="h-set">
+      <div class="panel-head"><h2 id="h-set" data-t="settings">Einstellungen</h2></div>
+      <div class="settings">
+        <div class="set">
+          <span class="t" data-t="location">Standort</span>
+          <div class="loc-row">
+            <span class="loc-text"><strong id="locName">–</strong><span class="small muted" id="locState"></span></span>
+            <span class="live" id="locLive" hidden><span class="dot"></span><span data-t="live">Live</span></span>
+          </div>
+          <div class="chips">
+            <button type="button" class="chip" id="btnGps" data-t="useGps">Standort verwenden</button>
+            <button type="button" class="chip" id="btnSearch" data-t="searchPlace">Ort suchen</button>
+          </div>
+          <form class="search" id="searchForm" hidden>
+            <label class="sr-only" for="searchInput" data-t="searchPlace">Ort suchen</label>
+            <input id="searchInput" type="search" autocomplete="off" enterkeyhint="search">
+            <button type="submit" class="chip" data-t="search">Suchen</button>
+          </form>
+          <ul class="results" id="searchResults" hidden></ul>
+        </div>
+        <div class="set">
+          <span class="t" data-t="method">Methode</span>
+          <div class="chips" id="methodChips" role="group"></div>
+        </div>
+        <div class="set">
+          <span class="t" data-t="language">Sprache</span>
+          <div class="chips" id="langChips" role="group"></div>
+        </div>
+        <div class="set">
+          <span class="t" data-t="notifications">Benachrichtigungen</span>
+          <span class="small muted" id="notifState"></span>
+          <div class="chips">
+            <button type="button" class="chip" id="btnNotif" data-t="notifEnable" hidden>Benachrichtigungen erlauben</button>
+            <button type="button" class="chip" id="btnTest" data-t="notifTest" hidden>Test senden</button>
+          </div>
+          <p class="hint small" data-ios-hint data-t="iosHint" hidden></p>
+        </div>
+      </div>
+    </section>
+
+    <p class="foot" id="foot"></p>
+  </main>
+</div>
+</body>
+</html>

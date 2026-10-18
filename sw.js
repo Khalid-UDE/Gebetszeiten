@@ -1,5 +1,5 @@
 // Service Worker: Offline-Betrieb und Push-Benachrichtigungen.
-const VERSION = "gz-v2";
+const VERSION = "gz-v3";
 const SHELL = [
   "./", "index.html", "styles.css", "manifest.webmanifest",
   "js/app.js", "js/praytimes.js", "js/i18n.js", "js/diyanet.js", "js/location.js", "js/push.js", "js/config.js",
@@ -8,7 +8,8 @@ const SHELL = [
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: "reload" → nie veraltete Dateien aus dem HTTP-Cache übernehmen
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", e => {
@@ -25,7 +26,8 @@ self.addEventListener("fetch", e => {
   if (!sameOrigin && !fonts) return; // APIs (Diyanet, Karten) immer live
   // Erst Netz, dann Cache – so kommen Updates sofort an und offline geht es trotzdem.
   e.respondWith(
-    fetch(e.request).then(res => {
+    // eigene Dateien immer beim Server nachprüfen, damit alle zur selben Version gehören
+    fetch(sameOrigin ? e.request.url : e.request, sameOrigin ? { cache: "no-cache", credentials: "same-origin" } : undefined).then(res => {
       if (res.ok || res.type === "opaque") {
         const copy = res.clone();
         caches.open(VERSION).then(c => c.put(e.request, copy));

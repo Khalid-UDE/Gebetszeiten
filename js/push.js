@@ -4,6 +4,11 @@ import { WORKER_URL } from "./config.js";
 export const serverConfigured = () => Boolean(WORKER_URL);
 
 let vapidKey = null;
+// Schlüssel schon beim Start holen: iOS erlaubt das Abo nur direkt nach dem Tippen,
+// ohne Wartezeit auf das Netz dazwischen.
+export async function prefetchKey() {
+  if (serverConfigured()) try { await serverKey(); } catch { /* später erneut */ }
+}
 async function serverKey() {
   if (vapidKey) return vapidKey;
   const r = await fetch(`${WORKER_URL}/vapid`);

@@ -2,7 +2,7 @@ import { PRAYER_KEYS, computeDay, ymdInZone, addDays, ymdKey } from "./praytimes
 import { LANGS, LANG_ORDER, METHOD_LABELS, ARABIC_NAMES, getLang, fmt, detectLang, notificationText } from "./i18n.js";
 import { fetchSchedule, nearestFromList, matchByAddress } from "./diyanet.js";
 import { geoSupported, geoPermission, getPosition, watchPosition, distanceKm, reverseGeocode, searchPlaces } from "./location.js";
-import { pushSupported, isIOS, isStandalone, permission, serverConfigured, currentSubscription, enablePush, syncSubscription, sendTest } from "./push.js";
+import { pushSupported, isIOS, isStandalone, permission, serverConfigured, currentSubscription, enablePush, syncSubscription, sendTest, prefetchKey } from "./push.js";
 
 const $ = id => document.getElementById(id);
 const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -389,7 +389,13 @@ $("searchForm").addEventListener("submit", async e => {
 
 // ---------- Start ----------
 async function init() {
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("SW", e));
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(e => console.warn("SW", e));
+  prefetchKey();
+  // Neue App-Version übernommen → einmal neu laden, damit alle Dateien zusammenpassen
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  }
   render();
   if (geoSupported() && !state.place?.manual) {
     const perm = await geoPermission();

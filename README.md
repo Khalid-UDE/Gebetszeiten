@@ -83,7 +83,7 @@ Benachrichtigungen funktionieren auf dem iPhone nur in der installierten App.
   - Abgeglichen mit aladhan.com für Essen, Berlin, Hamburg, Kiel, München und Freiburg im Sommer, Winter, Frühling und Herbst.
   - Abweichung höchstens 2 Minuten (Rundung).
 - **Diyanet:** offizielle Tabellen über den freien Spiegel `ezanvakti.emushaf.net` (gleiche Orts-IDs wie namazvakitleri.diyanet.gov.tr).
-  - Für Deutschland wählt die App den nächstgelegenen der rund 1 200 Diyanet-Orte über Koordinaten aus `data/diyanet-de.json`.
+  - Für Deutschland wählt die App den nächstgelegenen der 1 234 Diyanet-Orte über Koordinaten aus `data/diyanet-de.json`.
   - In anderen Ländern ordnet die App den Ort über den Ortsnamen zu.
   - Ohne Daten zeigt die App eine Näherung.
 - **Ortsnamen und Ortssuche:** OpenStreetMap Nominatim.

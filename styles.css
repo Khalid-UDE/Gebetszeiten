@@ -7,11 +7,16 @@
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --arabic:"Noto Naskh Arabic","Geeza Pro","Arabic Typesetting",serif;
 }
-@media (prefers-color-scheme:dark){:root{
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   color-scheme:dark;
   --bg:#121615; --surface:#1A1F1E; --ink:#E4E9E6; --muted:#A0ACA7; --faint:#8A9691;
   --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530;
 }}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121615; --surface:#1A1F1E; --ink:#E4E9E6; --muted:#A0ACA7; --faint:#8A9691;
+  --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530;
+}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.5;

@@ -62,14 +62,15 @@ export async function syncSubscription(sub, data) {
   return r.ok;
 }
 
+// Rückgabe: {ok, status, reason} vom Server
 export async function sendTest(sub, data) {
-  if (!serverConfigured() || !sub) return false;
+  if (!serverConfigured() || !sub) return { ok: false, reason: "no subscription" };
   const r = await fetch(`${WORKER_URL}/test`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ subscription: sub.toJSON(), ...data })
   });
-  return r.ok;
+  try { return await r.json(); } catch { return { ok: false, status: r.status, reason: "HTTP " + r.status }; }
 }
 
 export async function disablePush() {

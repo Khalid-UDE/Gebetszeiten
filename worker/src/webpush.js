@@ -41,7 +41,7 @@ async function vapidAuthorization(endpoint, publicKey, privateKey, subject) {
   const header = b64urlEncode(enc.encode(JSON.stringify({ typ: "JWT", alg: "ES256" })));
   const claims = b64urlEncode(enc.encode(JSON.stringify({
     aud: new URL(endpoint).origin,
-    exp: Math.floor(Date.now() / 1000) + 12 * 3600,
+    exp: Math.floor(Date.now() / 1000) + 3600, // Apple akzeptiert nur kurz gültige Tokens
     sub: subject
   })));
   const unsigned = `${header}.${claims}`;
@@ -77,7 +77,7 @@ export async function encryptPayload(payload, p256dh, auth) {
   return concat(header, cipher);
 }
 
-// Sendet eine Nachricht. Rückgabe: HTTP-Status des Push-Dienstes (201 = angenommen, 404/410 = Abo ungültig).
+// Sendet eine Nachricht. Rückgabe: {status, reason} des Push-Dienstes (201 = angenommen, 404/410 = Abo ungültig).
 export async function sendPush(subscription, payload, { publicKey, privateKey, subject, ttl = 900 }) {
   const body = await encryptPayload(JSON.stringify(payload), subscription.keys.p256dh, subscription.keys.auth);
   const res = await fetch(subscription.endpoint, {
@@ -91,5 +91,6 @@ export async function sendPush(subscription, payload, { publicKey, privateKey, s
     },
     body
   });
-  return res.status;
+  const reason = res.ok ? "" : (await res.text()).slice(0, 300);
+  return { status: res.status, reason };
 }

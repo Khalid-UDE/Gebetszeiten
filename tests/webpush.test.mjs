@@ -53,7 +53,7 @@ test("VAPID-Anfrage ist korrekt signiert", async () => {
   const orig = globalThis.fetch;
   globalThis.fetch = async (url, init) => { captured = { url, init }; return new Response(null, { status: 201 }); };
   try {
-    const status = await sendPush({ endpoint: "https://push.example.com/abc", keys: { p256dh: ua.p256dh, auth: ua.auth } },
+    const { status } = await sendPush({ endpoint: "https://push.example.com/abc", keys: { p256dh: ua.p256dh, auth: ua.auth } },
       { title: "t" }, { ...vapid, subject: "https://example.com" });
     assert.equal(status, 201);
   } finally { globalThis.fetch = orig; }

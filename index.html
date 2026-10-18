@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gebetszeiten</title>
 <meta name="description" content="Gebetszeiten für deinen Standort – mit Benachrichtigungen, Muslim World League oder offiziellen Diyanet-Zeiten.">
-<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121615" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)" id="tcLight">
+<meta name="theme-color" content="#121615" media="(prefers-color-scheme: dark)" id="tcDark">
 <meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>try{var t=JSON.parse(localStorage.getItem("gz-state-v2")||"{}").theme;if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <script type="module" src="js/app.js"></script>
 </head>
 <body>
@@ -100,6 +101,14 @@
           <div class="chips" id="methodChips" role="group"></div>
         </div>
         <div class="set">
+          <span class="t" data-t="theme">Design</span>
+          <div class="chips" id="themeChips" role="group">
+            <button type="button" class="chip" data-theme-choice="system" data-t="themeSystem">System</button>
+            <button type="button" class="chip" data-theme-choice="light" data-t="themeLight">Hell</button>
+            <button type="button" class="chip" data-theme-choice="dark" data-t="themeDark">Dunkel</button>
+          </div>
+        </div>
+        <div class="set">
           <span class="t" data-t="language">Sprache</span>
           <div class="chips" id="langChips" role="group"></div>
         </div>
@@ -110,6 +119,7 @@
             <button type="button" class="chip" id="btnNotif" data-t="notifEnable" hidden>Benachrichtigungen erlauben</button>
             <button type="button" class="chip" id="btnTest" data-t="notifTest" hidden>Test senden</button>
           </div>
+          <span class="small" id="testResult" role="status" hidden></span>
           <p class="hint small" data-ios-hint data-t="iosHint" hidden></p>
         </div>
       </div>

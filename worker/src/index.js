@@ -69,6 +69,15 @@ async function planNext(env, sub, afterMs) {
   return nextEvent(sub, afterMs, days);
 }
 
+// Fehler des Push-Dienstes festhalten (nur Dienst-Host, Status, Begründung), letzte 50
+async function logFailure(env, endpoint, status, reason) {
+  try {
+    await env.DB.prepare("INSERT INTO log (t, host, status, reason) VALUES (?, ?, ?, ?)")
+      .bind(Date.now(), new URL(endpoint).host, status, String(reason || "").slice(0, 300)).run();
+    await env.DB.prepare("DELETE FROM log WHERE t NOT IN (SELECT t FROM log ORDER BY t DESC LIMIT 50)").run();
+  } catch (e) { console.log("log failed", String(e)); }
+}
+
 const rowToSub = r => ({
   endpoint: r.endpoint, p256dh: r.p256dh, auth: r.auth, lat: r.lat, lng: r.lng, tz: r.tz, method: r.method,
   diyanetId: r.diyanet_id, lang: r.lang, bells: JSON.parse(r.bells || "{}")
@@ -103,7 +112,8 @@ async function handleCron(env) {
     let fails = r.fails || 0;
     if (now - r.next_at <= MAX_LATE_MS) {
       try {
-        const status = await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, message(sub, r.next_key, r.next_at), pushOptions(env));
+        const { status, reason } = await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, message(sub, r.next_key, r.next_at), pushOptions(env));
+        if (status >= 300) await logFailure(env, sub.endpoint, status, reason);
         if (status === 404 || status === 410) {
           await env.DB.prepare("DELETE FROM subs WHERE endpoint = ?").bind(sub.endpoint).run();
           return;
@@ -111,6 +121,7 @@ async function handleCron(env) {
         fails = status >= 200 && status < 300 ? 0 : fails + 1;
       } catch (e) {
         console.log("push failed", String(e));
+        await logFailure(env, sub.endpoint, 0, String(e.message || e));
         fails++;
       }
     }
@@ -149,9 +160,15 @@ export default {
         const sub = parseSub(body);
         const next = await upsert(env, sub);
         const key = next?.key || "dhuhr";
-        const status = await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-          { ...message(sub, key, next?.at || Date.now()), tag: "gz-test" }, pushOptions(env));
-        return json({ ok: status >= 200 && status < 300, status }, 200, headers);
+        try {
+          const { status, reason } = await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+            { ...message(sub, key, next?.at || Date.now()), tag: "gz-test" }, pushOptions(env));
+          if (status >= 300) await logFailure(env, sub.endpoint, status, reason);
+          return json({ ok: status >= 200 && status < 300, status, reason }, 200, headers);
+        } catch (e) {
+          await logFailure(env, sub.endpoint, 0, String(e.message || e));
+          return json({ ok: false, status: 0, reason: String(e.message || e) }, 200, headers);
+        }
       }
       return json({ error: "not found" }, 404, headers);
     } catch (e) {

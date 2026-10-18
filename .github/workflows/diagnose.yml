@@ -1,0 +1,40 @@
+name: Push-Server prüfen
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Status (ohne persönliche Daten)
+        working-directory: worker
+        run: |
+          npm install --no-audit --no-fund >/dev/null
+          ID=$(npx wrangler d1 list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).find(d=>d.name==="gebetszeiten").uuid))')
+          sed -i "s/database_id = \"[^\"]*\"/database_id = \"$ID\"/" wrangler.toml
+          URL=$(grep -o 'https://[^"]*workers.dev' ../js/config.js)
+          echo "== Worker: $URL"
+          curl -s "$URL/" ; echo
+          curl -s -o /dev/null -w "vapid: %{http_code}\n" "$URL/vapid"
+          curl -s -o /dev/null -w "CORS preflight: %{http_code}\n" -X OPTIONS -H "Origin: https://khalid-ude.github.io" -H "Access-Control-Request-Method: POST" "$URL/subscribe"
+          echo "== Secrets"
+          npx wrangler secret list --format json | grep -o '"name": *"[A-Z_]*"' || true
+          echo "== Abos (nur Push-Dienst, Methode, Status)"
+          npx wrangler d1 execute gebetszeiten --remote --json --command \
+            "SELECT substr(endpoint, 9, instr(substr(endpoint, 9), '/') - 1) AS dienst, method, lang, next_key, datetime(next_at/1000,'unixepoch') AS naechste_utc, fails, datetime(updated_at/1000,'unixepoch') AS aktualisiert_utc FROM subs" || true
+          echo "== Letzte Fehler der Push-Dienste"
+          npx wrangler d1 execute gebetszeiten --remote --json --command \
+            "SELECT datetime(t/1000,'unixepoch') AS zeit_utc, host, status, reason FROM log ORDER BY t DESC LIMIT 10" || true
+          echo "== Worker-Log (30 s mitschneiden)"
+          timeout 30 npx wrangler tail gebetszeiten-push --format pretty || true

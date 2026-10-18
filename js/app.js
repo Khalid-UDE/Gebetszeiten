@@ -16,6 +16,7 @@ const state = {
   diy: null,            // {id, name, lat, lng} – gewählter Diyanet-Ort
   bells: { fajr: true, sunrise: false, dhuhr: true, asr: true, maghrib: true, isha: true },
   onboarded: false,
+  theme: "system",      // "system" | "light" | "dark"
   geo: "unknown"        // Erlaubnisstatus Standort
 };
 try { Object.assign(state, JSON.parse(localStorage.getItem(STORE) || "{}")); } catch { /* frischer Start */ }
@@ -155,8 +156,11 @@ async function turnOnNotifications() {
   if (!pushSupported()) { render(); return; }
   try {
     const sub = await enablePush();
-    if (sub && sub !== "local") await syncSubscription(sub, state.place ? serverPayload() : {});
-  } catch (e) { console.warn("Push", e); }
+    if (sub && sub !== "local" && state.place) await syncSubscription(sub, serverPayload());
+  } catch (e) {
+    console.warn("Push", e);
+    showTestResult(T("testFailed", { msg: e.message || String(e) }), false);
+  }
   render();
   syncServer();
 }
@@ -195,6 +199,23 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 const BELL_ON = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>';
 const BELL_OFF = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.7 3.6A6 6 0 0 1 18 8c0 2.6.4 4.5 1 5.9"/><path d="M17 17H3s3-2 3-9c0-.6.1-1.2.3-1.8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/><path d="M2 2l20 20"/></svg>';
 
+function applyTheme() {
+  const t = state.theme;
+  if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  else delete document.documentElement.dataset.theme;
+  const forced = t === "dark" ? "#121615" : t === "light" ? "#F2F4F1" : null;
+  $("tcLight").content = forced || "#F2F4F1";
+  $("tcDark").content = forced || "#121615";
+  document.querySelectorAll("[data-theme-choice]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeChoice === (t || "system")));
+}
+
+function showTestResult(text, ok) {
+  const el = $("testResult");
+  el.textContent = text;
+  el.className = "small " + (ok ? "ok" : "muted");
+  el.hidden = !text;
+}
+
 function applyLanguage() {
   const lang = L();
   document.documentElement.lang = lang.locale.slice(0, 2);
@@ -232,6 +253,7 @@ function renderNotifState() {
 function render() {
   const lang = L(), now = new Date();
   applyLanguage();
+  applyTheme();
   renderChips();
   renderNotifState();
 
@@ -298,6 +320,7 @@ function render() {
 document.addEventListener("click", async e => {
   const b = e.target.closest("button");
   if (!b) return;
+  if (b.dataset.themeChoice) { state.theme = b.dataset.themeChoice; save(); applyTheme(); return; }
   if (b.dataset.method) { state.method = b.dataset.method; save(); await afterPlaceOrMethodChange(); return; }
   if (b.dataset.lang) {
     state.lang = b.dataset.lang; save(); render(); syncServer();
@@ -319,8 +342,19 @@ document.addEventListener("click", async e => {
     case "btnGps": if (state.place) state.place.manual = false; await requestLocation(); break;
     case "btnSearch": openSearch(); break;
     case "btnTest": {
-      const sub = await currentSubscription();
-      if (sub && state.place) await sendTest(sub, serverPayload());
+      // Tippen = Nutzeraktion: fehlendes Abo hier nachholen (iOS verlangt das)
+      b.disabled = true;
+      try {
+        const sub = (await currentSubscription()) || await enablePush();
+        if (!sub || sub === "local") throw new Error(permission() === "granted" ? "kein Push-Abo" : T("notifBlocked"));
+        if (!state.place) throw new Error(T("locationNone"));
+        await syncSubscription(sub, serverPayload());
+        const r = await sendTest(sub, serverPayload());
+        showTestResult(r.ok ? T("testSent") : T("testFailed", { msg: `${r.status || ""} ${r.reason || ""}`.trim() }), r.ok);
+      } catch (err) {
+        showTestResult(T("testFailed", { msg: err.message || String(err) }), false);
+      }
+      b.disabled = false;
       break;
     }
   }

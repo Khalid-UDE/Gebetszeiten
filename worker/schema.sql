@@ -23,3 +23,11 @@ CREATE TABLE IF NOT EXISTS diyanet (
   fetched_at  INTEGER NOT NULL,
   data        TEXT NOT NULL
 );
+
+-- Letzte Fehler der Push-Dienste (ohne persönliche Daten), zur Fehlersuche.
+CREATE TABLE IF NOT EXISTS log (
+  t       INTEGER NOT NULL,
+  host    TEXT,
+  status  INTEGER,
+  reason  TEXT
+);

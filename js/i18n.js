@@ -9,6 +9,7 @@ const TRANSLIT = { fajr: "Fajr", sunrise: "Shuruq", dhuhr: "Dhuhr", asr: "Asr", 
 
 const DE_UI = {
   appTitle: "Gebetszeiten",
+  theme: "Design", themeSystem: "System", themeLight: "Hell", themeDark: "Dunkel", testSent: "Test gesendet – die Benachrichtigung sollte gleich erscheinen.", testFailed: "Test fehlgeschlagen: {msg}",
   today: "Heute",
   nextPrayer: "Nächstes Gebet",
   nextPrayerTomorrow: "Nächstes Gebet · morgen",
@@ -67,7 +68,7 @@ export const LANGS = {
     label: "العربية", locale: "ar", dir: "rtl", arabic: false,
     names: ARABIC_NAMES,
     ui: {
-      appTitle: "مواقيت الصلاة", today: "اليوم", nextPrayer: "الصلاة القادمة", nextPrayerTomorrow: "الصلاة القادمة · غدًا", inDuration: "بعد {d}",
+      appTitle: "مواقيت الصلاة", theme: "المظهر", themeSystem: "النظام", themeLight: "فاتح", themeDark: "داكن", testSent: "تم إرسال التجربة – سيظهر الإشعار خلال لحظات.", testFailed: "فشلت التجربة: {msg}", today: "اليوم", nextPrayer: "الصلاة القادمة", nextPrayerTomorrow: "الصلاة القادمة · غدًا", inDuration: "بعد {d}",
       hours: "{h} س {m} د", minutes: "{m} دقيقة", settings: "الإعدادات", location: "الموقع",
       locationAuto: "الوصول إلى الموقع مسموح · يتحدث تلقائيًا", locationManual: "تم اختياره يدويًا",
       locationDenied: "الوصول إلى الموقع غير مسموح", locationNone: "لم يتم اختيار مكان بعد", live: "مباشر",
@@ -90,7 +91,7 @@ export const LANGS = {
     label: "English", locale: "en-GB", dir: "ltr", arabic: true,
     names: { fajr: "Fajr", sunrise: "Sunrise", dhuhr: "Dhuhr", asr: "Asr", maghrib: "Maghrib", isha: "Isha" },
     ui: {
-      appTitle: "Prayer Times", today: "Today", nextPrayer: "Next prayer", nextPrayerTomorrow: "Next prayer · tomorrow", inDuration: "in {d}",
+      appTitle: "Prayer Times", theme: "Appearance", themeSystem: "System", themeLight: "Light", themeDark: "Dark", testSent: "Test sent – the notification should appear shortly.", testFailed: "Test failed: {msg}", today: "Today", nextPrayer: "Next prayer", nextPrayerTomorrow: "Next prayer · tomorrow", inDuration: "in {d}",
       hours: "{h} h {m} min", minutes: "{m} min", settings: "Settings", location: "Location",
       locationAuto: "Location access allowed · updates automatically", locationManual: "Chosen manually",
       locationDenied: "Location access not allowed", locationNone: "No place chosen yet", live: "Live",
@@ -113,7 +114,7 @@ export const LANGS = {
     label: "Türkçe", locale: "tr-TR", dir: "ltr", arabic: false,
     names: { fajr: "Sabah", sunrise: "Güneş", dhuhr: "Öğle", asr: "İkindi", maghrib: "Akşam", isha: "Yatsı" },
     ui: {
-      appTitle: "Namaz Vakitleri", today: "Bugün", nextPrayer: "Sıradaki namaz", nextPrayerTomorrow: "Sıradaki namaz · yarın", inDuration: "{d} sonra",
+      appTitle: "Namaz Vakitleri", theme: "Görünüm", themeSystem: "Sistem", themeLight: "Açık", themeDark: "Koyu", testSent: "Test gönderildi – bildirim birazdan görünecek.", testFailed: "Test başarısız: {msg}", today: "Bugün", nextPrayer: "Sıradaki namaz", nextPrayerTomorrow: "Sıradaki namaz · yarın", inDuration: "{d} sonra",
       hours: "{h} sa {m} dk", minutes: "{m} dk", settings: "Ayarlar", location: "Konum",
       locationAuto: "Konum izni verildi · otomatik güncellenir", locationManual: "Elle seçildi",
       locationDenied: "Konum izni verilmedi", locationNone: "Henüz yer seçilmedi", live: "Canlı",
@@ -136,7 +137,7 @@ export const LANGS = {
     label: "Shqip", locale: "sq-AL", dir: "ltr", arabic: false,
     names: { fajr: "Sabahu", sunrise: "Lindja e diellit", dhuhr: "Dreka", asr: "Ikindia", maghrib: "Akshami", isha: "Jacia" },
     ui: {
-      appTitle: "Kohët e namazit", today: "Sot", nextPrayer: "Namazi i radhës", nextPrayerTomorrow: "Namazi i radhës · nesër", inDuration: "pas {d}",
+      appTitle: "Kohët e namazit", theme: "Pamja", themeSystem: "Sistemi", themeLight: "E çelët", themeDark: "E errët", testSent: "Prova u dërgua – njoftimi duhet të shfaqet së shpejti.", testFailed: "Prova dështoi: {msg}", today: "Sot", nextPrayer: "Namazi i radhës", nextPrayerTomorrow: "Namazi i radhës · nesër", inDuration: "pas {d}",
       hours: "{h} orë {m} min", minutes: "{m} min", settings: "Cilësimet", location: "Vendndodhja",
       locationAuto: "Qasja në vendndodhje u lejua · përditësohet automatikisht", locationManual: "Zgjedhur manualisht",
       locationDenied: "Qasja në vendndodhje nuk u lejua", locationNone: "Ende nuk është zgjedhur vend", live: "Live",
@@ -159,7 +160,7 @@ export const LANGS = {
     label: "Bosanski", locale: "bs-BA", dir: "ltr", arabic: false,
     names: { fajr: "Sabah", sunrise: "Izlazak sunca", dhuhr: "Podne", asr: "Ikindija", maghrib: "Akšam", isha: "Jacija" },
     ui: {
-      appTitle: "Namaska vremena", today: "Danas", nextPrayer: "Sljedeći namaz", nextPrayerTomorrow: "Sljedeći namaz · sutra", inDuration: "za {d}",
+      appTitle: "Namaska vremena", theme: "Izgled", themeSystem: "Sistem", themeLight: "Svijetlo", themeDark: "Tamno", testSent: "Test poslan – obavještenje bi se uskoro trebalo pojaviti.", testFailed: "Test nije uspio: {msg}", today: "Danas", nextPrayer: "Sljedeći namaz", nextPrayerTomorrow: "Sljedeći namaz · sutra", inDuration: "za {d}",
       hours: "{h} h {m} min", minutes: "{m} min", settings: "Postavke", location: "Lokacija",
       locationAuto: "Pristup lokaciji dozvoljen · ažurira se automatski", locationManual: "Ručno odabrano",
       locationDenied: "Pristup lokaciji nije dozvoljen", locationNone: "Mjesto još nije odabrano", live: "Uživo",

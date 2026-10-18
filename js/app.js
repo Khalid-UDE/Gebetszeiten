@@ -267,11 +267,12 @@ function render() {
   $("obLocationState").textContent = state.place ? `✓ ${state.place.name || ""}` : "";
   $("obDone").textContent = state.place ? T("done") : T("later");
 
-  $("setSub").textContent = state.place?.name ? `${state.place.name} · ${METHOD_LABELS[state.method]}` : METHOD_LABELS[state.method];
-  $("today").textContent = new Intl.DateTimeFormat(lang.locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now);
-  try {
-    $("hijri").textContent = new Intl.DateTimeFormat(lang.locale + "-u-ca-islamic-umalqura", { day: "numeric", month: "long", year: "numeric" }).format(now);
-  } catch { $("hijri").textContent = ""; }
+  // Kopfzeile aller Tabs: heutiges Datum oben, islamisches Datum unten
+  const todayText = new Intl.DateTimeFormat(lang.locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now);
+  let hijriText = "";
+  try { hijriText = new Intl.DateTimeFormat(lang.locale + "-u-ca-islamic-umalqura", { day: "numeric", month: "long", year: "numeric" }).format(now); } catch { /* ohne Hijri-Kalender */ }
+  document.querySelectorAll(".js-today").forEach(el => { el.textContent = todayText; });
+  document.querySelectorAll(".js-hijri").forEach(el => { el.textContent = hijriText; });
 
   // Standort-Block
   const p = state.place;
@@ -379,7 +380,7 @@ function renderQibla() {
   if (!p) { $("qStatus").textContent = T("locationNone"); $("qSub").textContent = ""; return; }
   const q = qiblaBearing(p.lat, p.lng);
   const km = new Intl.NumberFormat(L().locale, { maximumFractionDigits: 0 }).format(kaabaDistanceKm(p.lat, p.lng));
-  $("qDistance").textContent = T("qiblaDistance", { place: p.name || "", km }).replace(/^ · /, "");
+  $("qDistance").textContent = `${km} km`;
   $("qBearing").textContent = `${Math.round(q)}° ${dirName(q)}`;
   const d = declHere();
   $("qDecl").textContent = T("declNote", { d: new Intl.NumberFormat(L().locale, { maximumFractionDigits: 1, minimumFractionDigits: 1, signDisplay: "always" }).format(d) });

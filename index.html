@@ -57,9 +57,9 @@
   <main id="main" hidden>
    <div class="view" id="viewTimes">
     <header class="page-head">
-      <div class="eyebrow" id="today"></div>
+      <div class="eyebrow js-today"></div>
       <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="appTitle">Gebetszeiten</h1></div>
-      <div class="hijri" id="hijri"></div>
+      <div class="hijri js-hijri"></div>
     </header>
 
     <section class="next" aria-live="polite">
@@ -82,9 +82,9 @@
    <!-- Qibla -->
    <div class="view" id="viewQibla" hidden>
     <header class="page-head">
-      <div class="eyebrow"><span data-t="qibla">Qibla</span> · <span lang="ar" class="ar-inline">القبلة</span></div>
-      <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="qiblaTitle">Gebetsrichtung</h1></div>
-      <div class="hijri" id="qDistance"></div>
+      <div class="eyebrow js-today"></div>
+      <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="qibla">Qibla</h1></div>
+      <div class="hijri js-hijri"></div>
     </header>
     <section class="panel qibla-card">
       <svg id="compass" viewBox="0 -16 300 316" role="img" aria-labelledby="qStatus">
@@ -112,6 +112,7 @@
     </section>
     <section class="panel q-values">
       <div><span class="small muted" data-t="qibla">Qibla</span><span class="mono" id="qBearing">–</span></div>
+      <div><span class="small muted" data-t="distance">Entfernung</span><span class="mono" id="qDistance">–</span></div>
       <div><span class="small muted" data-t="phoneHeading">Handy zeigt</span><span class="mono" id="qHeading">–</span></div>
     </section>
     <p class="foot"><span id="qDecl"></span><br><span data-t="qiblaHint"></span></p>
@@ -120,9 +121,9 @@
    <!-- Einstellungen -->
    <div class="view" id="viewSettings" hidden>
     <header class="page-head">
-      <div class="eyebrow" data-t="appTitle">Gebetszeiten</div>
+      <div class="eyebrow js-today"></div>
       <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="settings">Einstellungen</h1></div>
-      <div class="hijri" id="setSub"></div>
+      <div class="hijri js-hijri"></div>
     </header>
     <section class="panel">
       <div class="settings">

@@ -139,4 +139,11 @@ ul.times{list-style:none;margin:0;padding:2px 6px 4px 16px}
 .q-values>div{padding:10px 16px;display:flex;flex-direction:column}
 .q-values>div+div{border-inline-start:1px solid var(--line)}
 .mono{font-family:var(--mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
-#viewSettings h1{margin-bottom:-4px}
+
+/* gleiche Kopfzeile in allen Tabs – nichts springt beim Wechseln */
+.page-head{gap:4px}
+.page-head .eyebrow{height:18px;line-height:18px}
+.page-head .hijri{height:21px;line-height:21px}
+.page-head .eyebrow,.page-head .hijri{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-head .brand{height:44px}
+.page-head h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:44px}

@@ -1,5 +1,5 @@
 // Service Worker: Offline-Betrieb und Push-Benachrichtigungen.
-const VERSION = "gz-v6";
+const VERSION = "gz-v7";
 const SHELL = [
   "./", "index.html", "styles.css", "manifest.webmanifest",
   "js/app.js", "js/qibla.js", "js/geomag.js", "js/praytimes.js", "js/i18n.js", "js/diyanet.js", "js/location.js", "js/push.js", "js/config.js",

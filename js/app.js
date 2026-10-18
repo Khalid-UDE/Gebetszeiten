@@ -2,6 +2,7 @@ import { PRAYER_KEYS, computeDay, ymdInZone, addDays, ymdKey } from "./praytimes
 import { LANGS, LANG_ORDER, METHOD_LABELS, ARABIC_NAMES, getLang, fmt, detectLang, notificationText } from "./i18n.js";
 import { fetchSchedule, nearestFromList, matchByAddress } from "./diyanet.js";
 import { geoSupported, geoPermission, getPosition, watchPosition, distanceKm, reverseGeocode, searchPlaces } from "./location.js";
+import { declination } from "./geomag.js";
 import { qiblaBearing, kaabaDistanceKm, angleDiff, needsPermission, requestPermission, watchHeading } from "./qibla.js";
 import { pushSupported, isIOS, isStandalone, permission, serverConfigured, currentSubscription, enablePush, syncSubscription, sendTest, prefetchKey } from "./push.js";
 
@@ -335,7 +336,16 @@ function showTab(t) {
 
 // ---------- Qibla-Kompass ----------
 const SVG = "http://www.w3.org/2000/svg";
-let heading = null, stopHeading = null, sensorTimer = null, sensorMissing = false, wasAligned = false;
+let heading = null, stopHeading = null, sensorTimer = null, sensorMissing = false, wasAligned = false, compassGranted = false;
+// Missweisung am aktuellen Ort (Kompass zeigt magnetisch Nord, Qibla bezieht sich auf geografisch Nord)
+let decl = { key: "", value: 0 };
+function declHere() {
+  const p = state.place;
+  if (!p) return 0;
+  const key = `${p.lat.toFixed(1)},${p.lng.toFixed(1)}`;
+  if (decl.key !== key) decl = { key, value: declination(p.lat, p.lng) };
+  return decl.value;
+}
 const polar = (deg, r) => { const a = (deg - 90) * Math.PI / 180; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; };
 
 function buildDial() {
@@ -370,6 +380,8 @@ function renderQibla() {
   const km = new Intl.NumberFormat(L().locale, { maximumFractionDigits: 0 }).format(kaabaDistanceKm(p.lat, p.lng));
   $("qDistance").textContent = T("qiblaDistance", { place: p.name || "", km }).replace(/^ · /, "");
   $("qBearing").textContent = `${Math.round(q)}° ${dirName(q)}`;
+  const d = declHere();
+  $("qDecl").textContent = T("declNote", { d: new Intl.NumberFormat(L().locale, { maximumFractionDigits: 1, minimumFractionDigits: 1, signDisplay: "always" }).format(d) });
   $("qHeading").textContent = heading == null ? "–" : `${Math.round(heading)}°`;
   $("qDial").setAttribute("transform", `rotate(${-(heading ?? 0)} 150 150)`);
   $("qArrowGroup").setAttribute("transform", `rotate(${q} 150 150)`);
@@ -390,18 +402,19 @@ function renderQibla() {
 
 async function startCompass(fromTap) {
   if (stopHeading) return;
-  if (needsPermission() && !fromTap && !state.compassOk) { $("btnCompass").hidden = false; return; }
-  if (!(await requestPermission())) {
+  // iPhone: Abfrage nur nach Tippen auf „Kompass starten“ (iOS merkt sich die Erlaubnis nur bis zum Schließen der App)
+  if (needsPermission() && !fromTap && !compassGranted) { $("btnCompass").hidden = false; return; }
+  if (!compassGranted && !(await requestPermission())) {
     $("btnCompass").hidden = false;
     $("qSub").textContent = T("compassDenied");
     return;
   }
-  state.compassOk = true; save();
+  compassGranted = true;
   $("btnCompass").hidden = true;
   sensorMissing = false;
   stopHeading = watchHeading(h => {
     clearTimeout(sensorTimer);
-    heading = h;
+    heading = (h + declHere() + 360) % 360;
     if (tab === "qibla") renderQibla();
   });
   clearTimeout(sensorTimer);

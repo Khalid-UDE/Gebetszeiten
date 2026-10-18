@@ -1,8 +1,8 @@
 // Service Worker: Offline-Betrieb und Push-Benachrichtigungen.
-const VERSION = "gz-v3";
+const VERSION = "gz-v4";
 const SHELL = [
   "./", "index.html", "styles.css", "manifest.webmanifest",
-  "js/app.js", "js/praytimes.js", "js/i18n.js", "js/diyanet.js", "js/location.js", "js/push.js", "js/config.js",
+  "js/app.js", "js/qibla.js", "js/praytimes.js", "js/i18n.js", "js/diyanet.js", "js/location.js", "js/push.js", "js/config.js",
   "data/diyanet-de.json",
   "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-180.png", "icons/badge-72.png"
 ];

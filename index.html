@@ -55,6 +55,7 @@
 
   <!-- Hauptansicht -->
   <main id="main" hidden>
+   <div class="view" id="viewTimes">
     <header>
       <div class="eyebrow" id="today"></div>
       <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="appTitle">Gebetszeiten</h1></div>
@@ -75,9 +76,51 @@
       </div>
       <ul class="times" id="times"></ul>
     </section>
+    <p class="foot" id="foot"></p>
+   </div>
 
-    <section class="panel" aria-labelledby="h-set">
-      <div class="panel-head"><h2 id="h-set" data-t="settings">Einstellungen</h2></div>
+   <!-- Qibla -->
+   <div class="view" id="viewQibla" hidden>
+    <header>
+      <div class="eyebrow"><span data-t="qibla">Qibla</span> · <span lang="ar" class="ar-inline">القبلة</span></div>
+      <h1 data-t="qiblaTitle">Gebetsrichtung</h1>
+      <div class="hijri" id="qDistance"></div>
+    </header>
+    <section class="panel qibla-card">
+      <svg id="compass" viewBox="0 -16 300 316" role="img" aria-labelledby="qStatus">
+        <path id="qMark" d="M150 -14 L160 4 L140 4 Z"/>
+        <circle id="qDisc" cx="150" cy="150" r="140"/>
+        <g id="qDial">
+          <g id="qTicks"></g>
+          <g id="qLetters"></g>
+          <g id="qArrowGroup">
+            <path id="qArrow" d="M150 52 L176 120 L156 112 L156 196 L144 196 L144 112 L124 120 Z"/>
+            <g transform="translate(150 12)">
+              <circle class="kaaba-bg" r="18"/>
+              <rect x="-8" y="-8" width="16" height="16" rx="2" fill="#1B2220"/>
+              <rect x="-8" y="-3.5" width="16" height="3" fill="#C9952E"/>
+            </g>
+          </g>
+        </g>
+        <circle id="qHub" cx="150" cy="150" r="9"/>
+      </svg>
+      <div class="q-status">
+        <span id="qStatus"></span>
+        <span class="small muted" id="qSub"></span>
+      </div>
+      <button type="button" class="btn primary" id="btnCompass" data-t="compassStart" hidden>Kompass starten</button>
+    </section>
+    <section class="panel q-values">
+      <div><span class="small muted" data-t="qibla">Qibla</span><span class="mono" id="qBearing">–</span></div>
+      <div><span class="small muted" data-t="phoneHeading">Handy zeigt</span><span class="mono" id="qHeading">–</span></div>
+    </section>
+    <p class="foot" data-t="qiblaHint"></p>
+   </div>
+
+   <!-- Einstellungen -->
+   <div class="view" id="viewSettings" hidden>
+    <h1 data-t="settings">Einstellungen</h1>
+    <section class="panel">
       <div class="settings">
         <div class="set">
           <span class="t" data-t="location">Standort</span>
@@ -124,8 +167,13 @@
         </div>
       </div>
     </section>
+   </div>
 
-    <p class="foot" id="foot"></p>
+   <nav class="tabbar" id="tabbar">
+    <button type="button" data-tab="times" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-t="tabTimes">Gebetszeiten</span></button>
+    <button type="button" data-tab="qibla"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span data-t="tabQibla">Qibla</span></button>
+    <button type="button" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="settings">Einstellungen</span></button>
+   </nav>
   </main>
 </div>
 </body>

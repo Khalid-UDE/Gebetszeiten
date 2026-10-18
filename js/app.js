@@ -2,6 +2,7 @@ import { PRAYER_KEYS, computeDay, ymdInZone, addDays, ymdKey } from "./praytimes
 import { LANGS, LANG_ORDER, METHOD_LABELS, ARABIC_NAMES, getLang, fmt, detectLang, notificationText } from "./i18n.js";
 import { fetchSchedule, nearestFromList, matchByAddress } from "./diyanet.js";
 import { geoSupported, geoPermission, getPosition, watchPosition, distanceKm, reverseGeocode, searchPlaces } from "./location.js";
+import { qiblaBearing, kaabaDistanceKm, angleDiff, needsPermission, requestPermission, watchHeading } from "./qibla.js";
 import { pushSupported, isIOS, isStandalone, permission, serverConfigured, currentSubscription, enablePush, syncSubscription, sendTest, prefetchKey } from "./push.js";
 
 const $ = id => document.getElementById(id);
@@ -256,6 +257,7 @@ function render() {
   applyTheme();
   renderChips();
   renderNotifState();
+  if (tab === "qibla") renderQibla();
 
   $("onboarding").hidden = state.onboarded;
   $("main").hidden = !state.onboarded;
@@ -316,10 +318,106 @@ function render() {
     : today.src === "approx" ? T("sourceApprox") : T("sourceCalc");
 }
 
+// ---------- Tabs ----------
+let tab = "times";
+function showTab(t) {
+  tab = t;
+  $("viewTimes").hidden = t !== "times";
+  $("viewQibla").hidden = t !== "qibla";
+  $("viewSettings").hidden = t !== "settings";
+  document.querySelectorAll("[data-tab]").forEach(b => {
+    if (b.dataset.tab === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+  });
+  window.scrollTo(0, 0);
+  if (t === "qibla") startCompass(false); else stopCompass();
+  render();
+}
+
+// ---------- Qibla-Kompass ----------
+const SVG = "http://www.w3.org/2000/svg";
+let heading = null, stopHeading = null, sensorTimer = null, sensorMissing = false, wasAligned = false;
+const polar = (deg, r) => { const a = (deg - 90) * Math.PI / 180; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; };
+
+function buildDial() {
+  const ticks = $("qTicks");
+  if (ticks.childElementCount) return;
+  for (let d = 0; d < 360; d += 10) {
+    const big = d % 30 === 0, [x1, y1] = polar(d, 132), [x2, y2] = polar(d, big ? 118 : 124);
+    const l = document.createElementNS(SVG, "line");
+    l.setAttribute("x1", x1.toFixed(1)); l.setAttribute("y1", y1.toFixed(1));
+    l.setAttribute("x2", x2.toFixed(1)); l.setAttribute("y2", y2.toFixed(1));
+    l.setAttribute("stroke-width", big ? 2 : 1);
+    ticks.appendChild(l);
+  }
+  for (const d of [0, 90, 180, 270]) {
+    const [x, y] = polar(d, 102), t = document.createElementNS(SVG, "text");
+    t.setAttribute("x", x.toFixed(1)); t.setAttribute("y", y.toFixed(1));
+    t.setAttribute("transform", `rotate(${d} ${x.toFixed(1)} ${y.toFixed(1)})`);
+    if (d === 0) t.setAttribute("class", "n");
+    $("qLetters").appendChild(t);
+  }
+}
+
+const dirName = deg => T("dirs").split(",")[Math.round(deg / 45) % 8];
+
+function renderQibla() {
+  buildDial();
+  const dirs = T("dirs").split(",");
+  [...$("qLetters").children].forEach((t, i) => { t.textContent = dirs[i * 2]; });
+  const p = state.place;
+  if (!p) { $("qStatus").textContent = T("locationNone"); $("qSub").textContent = ""; return; }
+  const q = qiblaBearing(p.lat, p.lng);
+  const km = new Intl.NumberFormat(L().locale, { maximumFractionDigits: 0 }).format(kaabaDistanceKm(p.lat, p.lng));
+  $("qDistance").textContent = T("qiblaDistance", { place: p.name || "", km }).replace(/^ · /, "");
+  $("qBearing").textContent = `${Math.round(q)}° ${dirName(q)}`;
+  $("qHeading").textContent = heading == null ? "–" : `${Math.round(heading)}°`;
+  $("qDial").setAttribute("transform", `rotate(${-(heading ?? 0)} 150 150)`);
+  $("qArrowGroup").setAttribute("transform", `rotate(${q} 150 150)`);
+  const card = document.querySelector(".qibla-card");
+  if (heading == null) {
+    card.classList.remove("ok");
+    $("qStatus").textContent = sensorMissing ? `${Math.round(q)}° ${dirName(q)}` : "";
+    $("qSub").textContent = sensorMissing ? T("noSensor", { deg: Math.round(q), dir: dirName(q) }) : "";
+    return;
+  }
+  const diff = angleDiff(heading, q), ok = Math.abs(diff) <= 3;
+  card.classList.toggle("ok", ok);
+  $("qStatus").textContent = ok ? T("aligned") : T(diff > 0 ? "turnRight" : "turnLeft", { d: Math.round(Math.abs(diff)) });
+  $("qSub").textContent = ok ? T("alignedSub") : T("turnSub");
+  if (ok && !wasAligned && navigator.vibrate) navigator.vibrate(60);
+  wasAligned = ok;
+}
+
+async function startCompass(fromTap) {
+  if (stopHeading) return;
+  if (needsPermission() && !fromTap && !state.compassOk) { $("btnCompass").hidden = false; return; }
+  if (!(await requestPermission())) {
+    $("btnCompass").hidden = false;
+    $("qSub").textContent = T("compassDenied");
+    return;
+  }
+  state.compassOk = true; save();
+  $("btnCompass").hidden = true;
+  sensorMissing = false;
+  stopHeading = watchHeading(h => {
+    clearTimeout(sensorTimer);
+    heading = h;
+    if (tab === "qibla") renderQibla();
+  });
+  clearTimeout(sensorTimer);
+  sensorTimer = setTimeout(() => { if (heading == null) { sensorMissing = true; renderQibla(); } }, 3000);
+}
+
+function stopCompass() {
+  stopHeading?.(); stopHeading = null;
+  clearTimeout(sensorTimer);
+}
+
 // ---------- Ereignisse ----------
 document.addEventListener("click", async e => {
   const b = e.target.closest("button");
   if (!b) return;
+  if (b.dataset.tab) { showTab(b.dataset.tab); return; }
   if (b.dataset.themeChoice) { state.theme = b.dataset.themeChoice; save(); applyTheme(); return; }
   if (b.dataset.method) { state.method = b.dataset.method; save(); await afterPlaceOrMethodChange(); return; }
   if (b.dataset.lang) {
@@ -336,7 +434,8 @@ document.addEventListener("click", async e => {
   }
   switch (b.id) {
     case "obLocation": b.disabled = true; await requestLocation(); b.disabled = false; break;
-    case "obManual": state.onboarded = true; save(); render(); openSearch(); break;
+    case "obManual": state.onboarded = true; save(); showTab("settings"); openSearch(); break;
+    case "btnCompass": await startCompass(true); renderQibla(); break;
     case "obNotif": case "btnNotif": await turnOnNotifications(); break;
     case "obDone": state.onboarded = true; save(); render(); break;
     case "btnGps": if (state.place) state.place.manual = false; await requestLocation(); break;

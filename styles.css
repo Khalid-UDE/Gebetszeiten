@@ -1,7 +1,7 @@
 :root{
   color-scheme:light;
   --bg:#F2F4F1; --surface:#FFFFFF; --ink:#1B2220; --muted:#5E6A65; --faint:#6F7B76;
-  --line:#D8DDD8; --accent:#2D6B5E; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#DCEBE6;
+  --line:#D8DDD8; --accent:#2D6B5E; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#DCEBE6; --gold:#B8892E; --kbg:#FFFFFF;
   --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --body:"Public Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
@@ -10,12 +10,12 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   color-scheme:dark;
   --bg:#121615; --surface:#1A1F1E; --ink:#E4E9E6; --muted:#A0ACA7; --faint:#8A9691;
-  --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530;
+  --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530; --gold:#E2B452; --kbg:#F3E9CF;
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#121615; --surface:#1A1F1E; --ink:#E4E9E6; --muted:#A0ACA7; --faint:#8A9691;
-  --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530;
+  --line:#2E3634; --accent:#76B8A7; --card:#2D6B5E; --oncard:#FFFFFF; --soft:#1F3530; --gold:#E2B452; --kbg:#F3E9CF;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -23,7 +23,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font
   padding:calc(env(safe-area-inset-top,0px) + 20px) calc(env(safe-area-inset-right,0px) + 16px) calc(env(safe-area-inset-bottom,0px) + 32px) calc(env(safe-area-inset-left,0px) + 16px)}
 [hidden]{display:none!important}
 .wrap{max-width:560px;margin:0 auto}
-main,.onboarding{display:flex;flex-direction:column;gap:16px}
+.onboarding,.view{display:flex;flex-direction:column;gap:16px}
+main{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}
 button,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -105,3 +106,37 @@ ul.times{list-style:none;margin:0;padding:2px 6px 4px 16px}
 .btn.link{border:0;background:transparent;color:var(--accent);font-weight:500}
 .btn.link.muted{color:var(--muted)}
 .btn:disabled{opacity:.6;cursor:default}
+
+/* Tab-Leiste */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:8px calc(env(safe-area-inset-right,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px) calc(env(safe-area-inset-left,0px) + 8px)}
+.tabbar button{border:0;background:transparent;color:var(--faint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;font-size:13px;font-weight:600;cursor:pointer;border-radius:10px}
+.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
+.tabbar svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ar-inline{font-family:var(--arabic);letter-spacing:0}
+
+/* Qibla */
+.qibla-card{padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+#compass{width:100%;max-width:320px;height:auto}
+#qMark{fill:var(--ink)}
+#qDisc{fill:var(--surface);stroke:var(--line);stroke-width:2;transition:fill .25s}
+#qTicks line{stroke:var(--faint);stroke-linecap:round}
+#qLetters text{font-family:var(--display);font-size:17px;font-weight:700;fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+#qLetters text.n{fill:var(--accent)}
+#qArrow{fill:var(--accent)}
+.kaaba-bg{fill:var(--kbg);stroke:var(--gold);stroke-width:2.5}
+#qHub{fill:var(--surface);stroke:var(--accent);stroke-width:3}
+.qibla-card.ok #qDisc{fill:var(--card);stroke:var(--card)}
+.qibla-card.ok #qTicks line{stroke:rgba(255,255,255,.55)}
+.qibla-card.ok #qLetters text{fill:#FFFFFF}
+.qibla-card.ok #qArrow{fill:#FFFFFF}
+.qibla-card.ok #qHub{fill:var(--card);stroke:#FFFFFF}
+.qibla-card.ok #qMark{fill:var(--accent)}
+.q-status{display:flex;flex-direction:column;align-items:center;text-align:center}
+#qStatus{font-family:var(--display);font-size:24px;font-weight:700}
+.qibla-card.ok #qStatus{color:var(--accent)}
+.q-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.q-values>div{padding:10px 16px;display:flex;flex-direction:column}
+.q-values>div+div{border-inline-start:1px solid var(--line)}
+.mono{font-family:var(--mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+#viewSettings h1{margin-bottom:-4px}

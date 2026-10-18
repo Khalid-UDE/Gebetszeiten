@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#145443"/>
+      <stop offset="1" stop-color="#0A2E25"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.5">
+      <stop offset="0" stop-color="#2E8A6E" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#2E8A6E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6DC8E"/>
+      <stop offset="0.55" stop-color="#E2B452"/>
+      <stop offset="1" stop-color="#C08A2E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hintergrund -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+
+  <!-- dezente Sterne -->
+  <g fill="#F6DC8E" opacity="0.55">
+    <circle cx="170" cy="200" r="5"/>
+    <circle cx="860" cy="170" r="6"/>
+    <circle cx="780" cy="300" r="3.5"/>
+    <circle cx="250" cy="330" r="3.5"/>
+    <circle cx="880" cy="420" r="3"/>
+    <circle cx="130" cy="450" r="3"/>
+  </g>
+
+  <g fill="url(#gold)">
+    <!-- Halbmond -->
+    <path d="M510.05,202.06 A30,30 0 1,0 541.29,238.50 A24,24 0 0,1 510.05,202.06 Z"/>
+    <rect x="507" y="262" width="10" height="62" rx="5"/>
+
+    <!-- Hauptkuppel (Zwiebelform) -->
+    <path d="M404,548 C352,486 420,424 482,392 C503,381 512,356 512,318 C512,356 521,381 542,392 C604,424 672,486 620,548 Z"/>
+    <!-- Tambour -->
+    <rect x="386" y="540" width="252" height="34" rx="6"/>
+
+    <!-- Hauptgebäude -->
+    <rect x="316" y="574" width="392" height="232" rx="6"/>
+
+    <!-- Minarett links -->
+    <rect x="222" y="430" width="56" height="376" rx="4"/>
+    <rect x="206" y="482" width="88" height="18" rx="6"/>
+    <rect x="212" y="418" width="76" height="16" rx="5"/>
+    <path d="M216,420 L250,318 L284,420 Z"/>
+    <circle cx="250" cy="304" r="10"/>
+
+    <!-- Minarett rechts -->
+    <rect x="746" y="430" width="56" height="376" rx="4"/>
+    <rect x="730" y="482" width="88" height="18" rx="6"/>
+    <rect x="736" y="418" width="76" height="16" rx="5"/>
+    <path d="M740,420 L774,318 L808,420 Z"/>
+    <circle cx="774" cy="304" r="10"/>
+
+    <!-- Boden -->
+    <rect x="176" y="806" width="672" height="26" rx="13"/>
+  </g>
+
+  <!-- Tür und Fenster (Spitzbögen, ausgespart) -->
+  <g fill="#0C3429">
+    <path d="M466,806 V712 Q466,666 512,640 Q558,666 558,712 V806 Z"/>
+    <path d="M362,720 V682 Q362,656 384,642 Q406,656 406,682 V720 Z"/>
+    <path d="M618,720 V682 Q618,656 640,642 Q662,656 662,682 V720 Z"/>
+    <path d="M240,600 V574 Q240,556 250,548 Q260,556 260,574 V600 Z"/>
+    <path d="M764,600 V574 Q764,556 774,548 Q784,556 784,574 V600 Z"/>
+    <rect x="316" y="592" width="392" height="6" opacity="0.5"/>
+  </g>
+</svg>

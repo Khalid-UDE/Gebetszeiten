@@ -1,0 +1,13 @@
+{
+  "name": "gebetszeiten-push",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "deploy": "node scripts/setup.mjs",
+    "dev": "wrangler dev --test-scheduled"
+  },
+  "devDependencies": {
+    "wrangler": "^4.40.0"
+  }
+}

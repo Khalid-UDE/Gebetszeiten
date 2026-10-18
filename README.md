@@ -16,7 +16,8 @@ Installierbare Web-App (PWA) für die täglichen Gebetszeiten. Sie hat folgende 
   - Shqip
   - Bosanski
 - **Qibla-Kompass:** Er zeigt die Richtung zur Kaaba und die Entfernung. Der Kompass dreht sich mit dem Handy und wird grün, wenn die Richtung stimmt.
-  - Das iPhone fragt einmal nach der Erlaubnis für „Bewegung & Ausrichtung“.
+  - Der Handykompass zeigt zum magnetischen Norden. Die App rechnet die Missweisung mit dem World Magnetic Model 2025 heraus (`js/geomag.js`, offline). Geprüft ist das gegen die 100 offiziellen NOAA-Testwerte.
+  - iPhone: Die Erlaubnis für „Bewegung & Ausrichtung“ wird erst nach Tippen auf „Kompass starten“ abgefragt. iOS merkt sie sich nur, bis die App geschlossen wird.
   - Ohne Kompass-Sensor nennt die App die Richtung in Grad.
 - **Drei Tabs** unten: Gebetszeiten, Qibla und Einstellungen.
 - **Hell-/Dunkelmodus** passt sich automatisch an das System an.
@@ -113,6 +114,7 @@ Aufbau:
 | `js/diyanet.js` | Offizielle Diyanet-Zeiten und Ortszuordnung |
 | `js/location.js`, `js/push.js` | Standort, Benachrichtigungen |
 | `js/qibla.js` | Qibla-Richtung, Entfernung, Kompass-Sensor |
+| `js/geomag.js` | Missweisung (World Magnetic Model 2025) |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Installation und Offline-Betrieb |
 | `worker/` | Push-Server (Cloudflare Worker, D1, Cron jede Minute) |
 | `data/diyanet-de.json` | Koordinaten der Diyanet-Orte in Deutschland |

@@ -267,6 +267,7 @@ function render() {
   $("obLocationState").textContent = state.place ? `✓ ${state.place.name || ""}` : "";
   $("obDone").textContent = state.place ? T("done") : T("later");
 
+  $("setSub").textContent = state.place?.name ? `${state.place.name} · ${METHOD_LABELS[state.method]}` : METHOD_LABELS[state.method];
   $("today").textContent = new Intl.DateTimeFormat(lang.locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now);
   try {
     $("hijri").textContent = new Intl.DateTimeFormat(lang.locale + "-u-ca-islamic-umalqura", { day: "numeric", month: "long", year: "numeric" }).format(now);

@@ -56,7 +56,7 @@
   <!-- Hauptansicht -->
   <main id="main" hidden>
    <div class="view" id="viewTimes">
-    <header>
+    <header class="page-head">
       <div class="eyebrow" id="today"></div>
       <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="appTitle">Gebetszeiten</h1></div>
       <div class="hijri" id="hijri"></div>
@@ -81,9 +81,9 @@
 
    <!-- Qibla -->
    <div class="view" id="viewQibla" hidden>
-    <header>
+    <header class="page-head">
       <div class="eyebrow"><span data-t="qibla">Qibla</span> · <span lang="ar" class="ar-inline">القبلة</span></div>
-      <h1 data-t="qiblaTitle">Gebetsrichtung</h1>
+      <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="qiblaTitle">Gebetsrichtung</h1></div>
       <div class="hijri" id="qDistance"></div>
     </header>
     <section class="panel qibla-card">
@@ -119,7 +119,11 @@
 
    <!-- Einstellungen -->
    <div class="view" id="viewSettings" hidden>
-    <h1 data-t="settings">Einstellungen</h1>
+    <header class="page-head">
+      <div class="eyebrow" data-t="appTitle">Gebetszeiten</div>
+      <div class="brand"><img src="icons/icon.svg" alt="" width="44" height="44"><h1 data-t="settings">Einstellungen</h1></div>
+      <div class="hijri" id="setSub"></div>
+    </header>
     <section class="panel">
       <div class="settings">
         <div class="set">

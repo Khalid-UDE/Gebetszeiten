@@ -59,11 +59,15 @@ export async function enablePush() {
 // Einstellungen und Standort an den Server melden (anonym, nur das Abo als Schlüssel).
 export async function syncSubscription(sub, data) {
   if (!serverConfigured() || !sub) return false;
+  // Hat sich das Abo geändert (z. B. nach Neuinstallation), das alte beim Server entfernen
+  let previousEndpoint = null;
+  try { previousEndpoint = localStorage.getItem("gz-endpoint"); } catch { /* privat */ }
   const r = await fetch(`${WORKER_URL}/subscribe`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ subscription: sub.toJSON(), ...data })
+    body: JSON.stringify({ subscription: sub.toJSON(), ...data, previousEndpoint: previousEndpoint !== sub.endpoint ? previousEndpoint : null })
   });
+  if (r.ok) try { localStorage.setItem("gz-endpoint", sub.endpoint); } catch { /* privat */ }
   return r.ok;
 }
 

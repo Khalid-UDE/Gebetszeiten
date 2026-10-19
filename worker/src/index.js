@@ -4,8 +4,7 @@ import { LANGS, notificationText } from "../../js/i18n.js";
 import { fetchSchedule } from "../../js/diyanet.js";
 import { sendPush } from "./webpush.js";
 import { nextEvent, formatTime } from "./schedule.js";
-
-const MAX_LATE_MS = 10 * 60e3; // ältere verpasste Termine nicht mehr senden
+import { handleCron } from "./cron.js";
 
 function cors(env, req) {
   const origin = req.headers.get("Origin") || "";
@@ -40,7 +39,8 @@ function parseSub(body) {
   const lang = LANGS[body.lang] ? body.lang : "std";
   const bells = {};
   for (const k of PRAYER_KEYS) bells[k] = Boolean(body.bells?.[k]);
-  return { endpoint: s.endpoint, p256dh: s.keys.p256dh, auth: s.keys.auth, lat, lng, tz, method, diyanetId, lang, bells };
+  const previousEndpoint = typeof body.previousEndpoint === "string" && /^https:\/\//.test(body.previousEndpoint) ? body.previousEndpoint.slice(0, 1000) : null;
+  return { endpoint: s.endpoint, p256dh: s.keys.p256dh, auth: s.keys.auth, lat, lng, tz, method, diyanetId, lang, bells, previousEndpoint };
 }
 
 // Offizielle Diyanet-Tabelle, in D1 zwischengespeichert (max. 12 h alt).
@@ -94,7 +94,14 @@ function message(sub, key, atMs) {
 }
 
 async function upsert(env, sub) {
-  const next = await planNext(env, sub, Date.now());
+  // Ein schon verschickter Termin wird nicht erneut geplant – z. B. wenn die App
+  // durch Tippen auf genau diese Benachrichtigung geöffnet wird, kurz bevor es so weit ist.
+  const prev = await env.DB.prepare("SELECT sent_for FROM subs WHERE endpoint = ?").bind(sub.endpoint).first();
+  const after = Math.max(Date.now(), (prev?.sent_for || 0) + 30e3);
+  const next = await planNext(env, sub, after);
+  if (sub.previousEndpoint && sub.previousEndpoint !== sub.endpoint) {
+    await env.DB.prepare("DELETE FROM subs WHERE endpoint = ?").bind(sub.previousEndpoint).run();
+  }
   await env.DB.prepare(`INSERT INTO subs (endpoint, p256dh, auth, lat, lng, tz, method, diyanet_id, lang, bells, next_at, next_key, updated_at, fails)
     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, 0)
     ON CONFLICT(endpoint) DO UPDATE SET p256dh=?2, auth=?3, lat=?4, lng=?5, tz=?6, method=?7, diyanet_id=?8, lang=?9, bells=?10, next_at=?11, next_key=?12, updated_at=?13, fails=0`)
@@ -102,37 +109,6 @@ async function upsert(env, sub) {
       next ? next.at : null, next ? next.key : null, Date.now())
     .run();
   return next;
-}
-
-async function handleCron(env) {
-  const now = Date.now();
-  const { results } = await env.DB.prepare("SELECT * FROM subs WHERE next_at IS NOT NULL AND next_at <= ? ORDER BY next_at LIMIT 500").bind(now + 20e3).all();
-  await Promise.all(results.map(async r => {
-    const sub = rowToSub(r);
-    let fails = r.fails || 0;
-    if (now - r.next_at <= MAX_LATE_MS) {
-      try {
-        const { status, reason } = await sendPush({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, message(sub, r.next_key, r.next_at), pushOptions(env));
-        if (status >= 300) await logFailure(env, sub.endpoint, status, reason);
-        if (status === 404 || status === 410) {
-          await env.DB.prepare("DELETE FROM subs WHERE endpoint = ?").bind(sub.endpoint).run();
-          return;
-        }
-        fails = status >= 200 && status < 300 ? 0 : fails + 1;
-      } catch (e) {
-        console.log("push failed", String(e));
-        await logFailure(env, sub.endpoint, 0, String(e.message || e));
-        fails++;
-      }
-    }
-    if (fails > 50) {
-      await env.DB.prepare("DELETE FROM subs WHERE endpoint = ?").bind(sub.endpoint).run();
-      return;
-    }
-    const next = await planNext(env, sub, Math.max(r.next_at, now - MAX_LATE_MS) + 30e3);
-    await env.DB.prepare("UPDATE subs SET next_at = ?, next_key = ?, fails = ? WHERE endpoint = ?")
-      .bind(next ? next.at : null, next ? next.key : null, fails, sub.endpoint).run();
-  }));
 }
 
 export default {
@@ -177,6 +153,6 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(handleCron(env));
+    ctx.waitUntil(handleCron(env, { planNext, message, logFailure, pushOptions, send: sendPush, rowToSub }));
   }
 };

@@ -26,6 +26,10 @@ const tomlPath = join(root, "wrangler.toml");
 const toml = readFileSync(tomlPath, "utf8").replace(/database_id = "[^"]*"/, `database_id = "${db.uuid}"`);
 writeFileSync(tomlPath, toml);
 run(`d1 execute ${DB} --remote --file=schema.sql -y`);
+// Spalten, die nach der ersten Einrichtung dazugekommen sind (Fehler = schon vorhanden)
+for (const col of ["sent_for INTEGER"]) {
+  try { run(`d1 execute ${DB} --remote --command="ALTER TABLE subs ADD COLUMN ${col}" -y`, { stdio: ["pipe", "pipe", "pipe"] }); } catch { /* vorhanden */ }
+}
 console.log("  ok:", db.uuid);
 
 step("Worker veröffentlichen");

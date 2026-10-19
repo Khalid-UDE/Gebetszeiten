@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS subs (
   next_at     INTEGER,
   next_key    TEXT,
   updated_at  INTEGER,
-  fails       INTEGER DEFAULT 0
+  fails       INTEGER DEFAULT 0,
+  sent_for    INTEGER             -- Zeitpunkt des zuletzt verschickten Gebets
 );
 CREATE INDEX IF NOT EXISTS subs_next_at ON subs(next_at);
 

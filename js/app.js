@@ -124,18 +124,25 @@ async function afterPlaceOrMethodChange() {
   syncServer();
 }
 
+// Was die Ortung zuletzt geliefert hat – wird in den Einstellungen offen angezeigt
+const fix = { at: 0, err: null, busy: false };
+const gotFix = () => { fix.at = Date.now(); fix.err = null; fix.busy = false; };
+const fixFailed = e => { fix.err = e?.code === 1 ? T("locationDenied") : (e?.message || "Timeout"); fix.busy = false; render(); };
+
 let stopWatch = null;
 function startWatching() {
   if (stopWatch || !geoSupported() || state.place?.manual) return;
   stopWatch = watchPosition(
-    pos => { state.geo = "granted"; setPlace(pos, false); },
-    err => { if (err.code === 1) { state.geo = "denied"; stopWatch?.(); stopWatch = null; save(); render(); } }
+    pos => { state.geo = "granted"; gotFix(); setPlace(pos, false); render(); },
+    err => { if (err.code === 1) { state.geo = "denied"; stopWatch?.(); stopWatch = null; save(); } fixFailed(err); }
   );
 }
 
 async function requestLocation() {
+  fix.busy = true; render();
   try {
     const pos = await getPosition();
+    gotFix();
     state.geo = "granted";
     save();
     await setPlace(pos, false);
@@ -143,7 +150,7 @@ async function requestLocation() {
     return true;
   } catch (e) {
     state.geo = e.code === 1 ? "denied" : state.geo;
-    save(); render();
+    save(); fixFailed(e);
     return false;
   }
 }
@@ -292,9 +299,15 @@ function render() {
   // Standort-Block
   const p = state.place;
   $("locName").textContent = p ? (p.name || `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)}`) : T("locationNone");
-  $("locState").textContent = !p ? (state.geo === "denied" ? T("locationDenied") : "") : p.manual ? T("locationManual") : `${T("locationAuto")} · ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
-  $("locLive").hidden = !p || p.manual;
-  $("btnGps").hidden = Boolean(p && !p.manual) || !geoSupported();
+  const t = d => new Intl.DateTimeFormat(lang.locale, { hour: "2-digit", minute: "2-digit" }).format(d);
+  $("locState").textContent = !p ? (state.geo === "denied" ? T("locationDenied") : "")
+    : p.manual ? T("locationManual")
+    : [fix.busy ? T("locLocating") : fix.err ? T("locError", { msg: fix.err }) : fix.at ? T("locFix", { t: t(fix.at) }) : T("locLocating"),
+       `${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`].join(" · ");
+  // „Live“ nur, wenn in den letzten 5 Minuten wirklich eine Ortung ankam
+  $("locLive").hidden = !p || p.manual || !fix.at || fix.err || Date.now() - fix.at > 5 * 60e3;
+  $("btnGps").hidden = !geoSupported();
+  $("btnGps").textContent = p && !p.manual ? T("locRefresh") : T("useGps");
 
   if (!p) {
     $("nextLbl").textContent = T("nextPrayer");

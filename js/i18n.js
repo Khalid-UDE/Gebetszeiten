@@ -21,7 +21,7 @@ const DE_UI = {
   minutes: "{m} min",
   settings: "Einstellungen",
   location: "Standort",
-  locationAuto: "Standortzugriff erlaubt · aktualisiert sich automatisch",
+  locationAuto: "Standortzugriff erlaubt · aktualisiert sich automatisch", locFix: "Zuletzt geortet {t}", locLocating: "Wird geortet …", locError: "Ortung fehlgeschlagen: {msg}", locRefresh: "Standort aktualisieren",
   locationManual: "Manuell gewählt",
   locationDenied: "Standortzugriff nicht erlaubt",
   locationNone: "Noch kein Ort gewählt",
@@ -73,7 +73,7 @@ export const LANGS = {
     ui: {
       appTitle: "مواقيت الصلاة", distance: "المسافة", declNote: "تم احتساب الانحراف المغناطيسي {d}°", tabTimes: "مواقيت الصلاة", tabQibla: "القبلة", qibla: "القبلة", phoneHeading: "اتجاه الهاتف", turnRight: "{d}° إلى اليمين", turnLeft: "{d}° إلى اليسار", aligned: "الاتجاه صحيح", alignedSub: "أنت متجه نحو الكعبة", turnSub: "أدر الهاتف حتى يصبح السهم والكعبة في الأعلى", qiblaHint: "أمسك الهاتف بشكل مستوٍ وبعيدًا عن المعادن والمغناطيس", compassStart: "تشغيل البوصلة", noSensor: "لا توجد بوصلة – اتجه إلى {deg}° ({dir})", compassDenied: "لم يُسمح بالوصول إلى البوصلة", dirs: "ش,ش ق,ق,ج ق,ج,ج غ,غ,ش غ", theme: "المظهر", themeSystem: "النظام", themeLight: "فاتح", themeDark: "داكن", testSent: "تم إرسال التجربة – سيظهر الإشعار خلال لحظات.", testFailed: "فشلت التجربة: {msg}", today: "اليوم", nextPrayer: "الصلاة القادمة", nextPrayerTomorrow: "الصلاة القادمة · غدًا", inDuration: "بعد {d}",
       hours: "{h} س {m} د", minutes: "{m} دقيقة", settings: "الإعدادات", location: "الموقع",
-      locationAuto: "الوصول إلى الموقع مسموح · يتحدث تلقائيًا", locationManual: "تم اختياره يدويًا",
+      locationAuto: "الوصول إلى الموقع مسموح · يتحدث تلقائيًا", locFix: "آخر تحديد للموقع {t}", locLocating: "جارٍ تحديد الموقع …", locError: "فشل تحديد الموقع: {msg}", locRefresh: "تحديث الموقع", locationManual: "تم اختياره يدويًا",
       locationDenied: "الوصول إلى الموقع غير مسموح", locationNone: "لم يتم اختيار مكان بعد", live: "مباشر",
       useGps: "استخدام الموقع", searchPlace: "البحث عن مكان", searchPlaceholder: "اكتب اسم المدينة …", search: "بحث",
       noResults: "لم يتم العثور على مكان", method: "طريقة الحساب", language: "اللغة", notifications: "الإشعارات",
@@ -96,7 +96,7 @@ export const LANGS = {
     ui: {
       appTitle: "Prayer Times", distance: "Distance", declNote: "Magnetic declination {d}° applied", tabTimes: "Prayer times", tabQibla: "Qibla", qibla: "Qibla", phoneHeading: "Phone points", turnRight: "{d}° to the right", turnLeft: "{d}° to the left", aligned: "Direction is correct", alignedSub: "You are facing the Kaaba", turnSub: "Turn the phone until arrow and Kaaba are at the top", qiblaHint: "Hold the phone flat · keep away from metal and magnets", compassStart: "Start compass", noSensor: "No compass sensor – face {deg}° ({dir})", compassDenied: "Compass access not allowed", dirs: "N,NE,E,SE,S,SW,W,NW", theme: "Appearance", themeSystem: "System", themeLight: "Light", themeDark: "Dark", testSent: "Test sent – the notification should appear shortly.", testFailed: "Test failed: {msg}", today: "Today", nextPrayer: "Next prayer", nextPrayerTomorrow: "Next prayer · tomorrow", inDuration: "in {d}",
       hours: "{h} h {m} min", minutes: "{m} min", settings: "Settings", location: "Location",
-      locationAuto: "Location access allowed · updates automatically", locationManual: "Chosen manually",
+      locationAuto: "Location access allowed · updates automatically", locFix: "Last located {t}", locLocating: "Locating …", locError: "Location failed: {msg}", locRefresh: "Update location", locationManual: "Chosen manually",
       locationDenied: "Location access not allowed", locationNone: "No place chosen yet", live: "Live",
       useGps: "Use my location", searchPlace: "Search place", searchPlaceholder: "Enter a city …", search: "Search",
       noResults: "No place found", method: "Method", language: "Language", notifications: "Notifications",
@@ -119,7 +119,7 @@ export const LANGS = {
     ui: {
       appTitle: "Namaz Vakitleri", distance: "Mesafe", declNote: "Manyetik sapma {d}° hesaba katıldı", tabTimes: "Vakitler", tabQibla: "Kıble", qibla: "Kıble", phoneHeading: "Telefon yönü", turnRight: "{d}° sağa", turnLeft: "{d}° sola", aligned: "Yön doğru", alignedSub: "Kâbe'ye doğru bakıyorsunuz", turnSub: "Ok ve Kâbe yukarıda olana kadar telefonu çevirin", qiblaHint: "Telefonu düz tutun · metal ve mıknatıslardan uzak tutun", compassStart: "Pusulayı başlat", noSensor: "Pusula sensörü yok – {deg}° ({dir}) yönüne dönün", compassDenied: "Pusula erişimine izin verilmedi", dirs: "K,KD,D,GD,G,GB,B,KB", theme: "Görünüm", themeSystem: "Sistem", themeLight: "Açık", themeDark: "Koyu", testSent: "Test gönderildi – bildirim birazdan görünecek.", testFailed: "Test başarısız: {msg}", today: "Bugün", nextPrayer: "Sıradaki namaz", nextPrayerTomorrow: "Sıradaki namaz · yarın", inDuration: "{d} sonra",
       hours: "{h} sa {m} dk", minutes: "{m} dk", settings: "Ayarlar", location: "Konum",
-      locationAuto: "Konum izni verildi · otomatik güncellenir", locationManual: "Elle seçildi",
+      locationAuto: "Konum izni verildi · otomatik güncellenir", locFix: "Son konum {t}", locLocating: "Konum alınıyor …", locError: "Konum alınamadı: {msg}", locRefresh: "Konumu güncelle", locationManual: "Elle seçildi",
       locationDenied: "Konum izni verilmedi", locationNone: "Henüz yer seçilmedi", live: "Canlı",
       useGps: "Konumumu kullan", searchPlace: "Yer ara", searchPlaceholder: "Şehir girin …", search: "Ara",
       noResults: "Yer bulunamadı", method: "Hesaplama yöntemi", language: "Dil", notifications: "Bildirimler",
@@ -142,7 +142,7 @@ export const LANGS = {
     ui: {
       appTitle: "Kohët e namazit", distance: "Distanca", declNote: "Deklinimi magnetik {d}° u mor parasysh", tabTimes: "Kohët", tabQibla: "Kibla", qibla: "Kibla", phoneHeading: "Telefoni tregon", turnRight: "{d}° djathtas", turnLeft: "{d}° majtas", aligned: "Drejtimi është i saktë", alignedSub: "Je kthyer nga Qabja", turnSub: "Rrotullo telefonin derisa shigjeta dhe Qabja të jenë lart", qiblaHint: "Mbaje telefonin të sheshtë · larg metalit dhe magnetëve", compassStart: "Nis busullën", noSensor: "Nuk ka sensor busulle – kthehu nga {deg}° ({dir})", compassDenied: "Qasja në busull nuk u lejua", dirs: "V,VL,L,JL,J,JP,P,VP", theme: "Pamja", themeSystem: "Sistemi", themeLight: "E çelët", themeDark: "E errët", testSent: "Prova u dërgua – njoftimi duhet të shfaqet së shpejti.", testFailed: "Prova dështoi: {msg}", today: "Sot", nextPrayer: "Namazi i radhës", nextPrayerTomorrow: "Namazi i radhës · nesër", inDuration: "pas {d}",
       hours: "{h} orë {m} min", minutes: "{m} min", settings: "Cilësimet", location: "Vendndodhja",
-      locationAuto: "Qasja në vendndodhje u lejua · përditësohet automatikisht", locationManual: "Zgjedhur manualisht",
+      locationAuto: "Qasja në vendndodhje u lejua · përditësohet automatikisht", locFix: "Lokalizuar së fundi {t}", locLocating: "Duke lokalizuar …", locError: "Lokalizimi dështoi: {msg}", locRefresh: "Përditëso vendndodhjen", locationManual: "Zgjedhur manualisht",
       locationDenied: "Qasja në vendndodhje nuk u lejua", locationNone: "Ende nuk është zgjedhur vend", live: "Live",
       useGps: "Përdor vendndodhjen", searchPlace: "Kërko vendin", searchPlaceholder: "Shkruaj qytetin …", search: "Kërko",
       noResults: "Nuk u gjet asnjë vend", method: "Metoda", language: "Gjuha", notifications: "Njoftimet",
@@ -165,7 +165,7 @@ export const LANGS = {
     ui: {
       appTitle: "Namaska vremena", distance: "Udaljenost", declNote: "Magnetska deklinacija {d}° uračunata", tabTimes: "Vaktija", tabQibla: "Kibla", qibla: "Kibla", phoneHeading: "Telefon pokazuje", turnRight: "{d}° udesno", turnLeft: "{d}° ulijevo", aligned: "Smjer je tačan", alignedSub: "Okrenut si prema Kabi", turnSub: "Okreći telefon dok strelica i Kaba ne budu gore", qiblaHint: "Drži telefon ravno · dalje od metala i magneta", compassStart: "Pokreni kompas", noSensor: "Nema senzora kompasa – okreni se prema {deg}° ({dir})", compassDenied: "Pristup kompasu nije dozvoljen", dirs: "S,SI,I,JI,J,JZ,Z,SZ", theme: "Izgled", themeSystem: "Sistem", themeLight: "Svijetlo", themeDark: "Tamno", testSent: "Test poslan – obavještenje bi se uskoro trebalo pojaviti.", testFailed: "Test nije uspio: {msg}", today: "Danas", nextPrayer: "Sljedeći namaz", nextPrayerTomorrow: "Sljedeći namaz · sutra", inDuration: "za {d}",
       hours: "{h} h {m} min", minutes: "{m} min", settings: "Postavke", location: "Lokacija",
-      locationAuto: "Pristup lokaciji dozvoljen · ažurira se automatski", locationManual: "Ručno odabrano",
+      locationAuto: "Pristup lokaciji dozvoljen · ažurira se automatski", locFix: "Posljednja lokacija {t}", locLocating: "Određivanje lokacije …", locError: "Lokacija nije određena: {msg}", locRefresh: "Ažuriraj lokaciju", locationManual: "Ručno odabrano",
       locationDenied: "Pristup lokaciji nije dozvoljen", locationNone: "Mjesto još nije odabrano", live: "Uživo",
       useGps: "Koristi moju lokaciju", searchPlace: "Traži mjesto", searchPlaceholder: "Unesi grad …", search: "Traži",
       noResults: "Mjesto nije pronađeno", method: "Metoda", language: "Jezik", notifications: "Obavještenja",

@@ -123,6 +123,7 @@ async function requestLocation() {
   try {
     const pos = await getPosition();
     state.geo = "granted";
+    save();
     await setPlace(pos, false);
     startWatching();
     return true;
@@ -513,7 +514,8 @@ async function init() {
   render();
   if (geoSupported() && !state.place?.manual) {
     const perm = await geoPermission();
-    if (perm === "granted" || (perm === "unknown" && state.geo === "granted")) { state.geo = "granted"; requestLocation(); }
+    // iOS meldet bei Home-Bildschirm-Apps oft "prompt", obwohl schon erlaubt → dann trotzdem abfragen
+    if (perm === "granted" || (perm !== "denied" && state.geo === "granted")) { state.geo = "granted"; requestLocation(); }
     else if (perm === "denied") state.geo = "denied";
   }
   if (state.method === "diyanet") { await resolveDiyanet(); await loadSchedule(); }

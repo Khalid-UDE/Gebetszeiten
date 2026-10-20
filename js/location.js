@@ -40,19 +40,40 @@ export function distanceKm(a, b) {
 const placeName = a => a.city || a.town || a.village || a.municipality || a.suburb || a.county || a.state || "";
 
 export async function reverseGeocode(lat, lng, locale) {
+  try { return await nominatimReverse(lat, lng, locale); }
+  catch (e) { console.warn("Nominatim", e); return await bigDataCloudReverse(lat, lng, locale); }
+}
+
+async function nominatimReverse(lat, lng, locale) {
   const url = `${NOMINATIM}/reverse?format=jsonv2&zoom=12&addressdetails=1&lat=${lat}&lon=${lng}&accept-language=${encodeURIComponent(locale)},en`;
   const r = await fetch(url, { headers: { Accept: "application/json" } });
   if (!r.ok) throw new Error("geocode " + r.status);
   const j = await r.json();
+  if (!j.address) throw new Error("geocode leer");
   // Englische Adresse zusätzlich für den Abgleich mit Diyanet-Ortsnamen
-  let en = j.address || {};
+  let en = j.address;
   if (!locale.startsWith("en")) {
     try {
       const r2 = await fetch(`${NOMINATIM}/reverse?format=jsonv2&zoom=12&addressdetails=1&lat=${lat}&lon=${lng}&accept-language=en`);
       if (r2.ok) en = (await r2.json()).address || en;
     } catch { /* optional */ }
   }
-  return { name: placeName(j.address || {}) || j.name || "", address: en };
+  return { name: placeName(j.address) || j.name || "", address: en };
+}
+
+// Ersatz, falls Nominatim ausfällt oder drosselt (frei nutzbar ohne Schlüssel)
+async function bigDataCloudReverse(lat, lng, locale) {
+  const get = async lang => {
+    const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=${lang}`);
+    if (!r.ok) throw new Error("geocode2 " + r.status);
+    return r.json();
+  };
+  const j = await get(locale.split("-")[0]);
+  let en = j;
+  try { en = await get("en"); } catch { /* optional */ }
+  const name = j.city || j.locality || j.principalSubdivision || "";
+  if (!name) throw new Error("geocode2 leer");
+  return { name, address: { city: en.city || en.locality, state: en.principalSubdivision, country_code: (en.countryCode || "").toLowerCase() } };
 }
 
 export async function searchPlaces(q, locale) {

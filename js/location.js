@@ -11,15 +11,17 @@ export async function geoPermission() {
   } catch { return "unknown"; }
 }
 
-// Fragt beim ersten Aufruf die System-Erlaubnis ab.
-export function getPosition() {
-  return new Promise((resolve, reject) => {
+// Fragt beim ersten Aufruf die System-Erlaubnis ab. Erst GPS, bei Zeitüberschreitung WLAN/Funkzelle.
+export async function getPosition() {
+  const once = (high, timeout) => new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
-      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      p => resolve({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }),
       reject,
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
+      { enableHighAccuracy: high, timeout, maximumAge: 30000 }
     );
   });
+  try { return await once(true, 15000); }
+  catch (e) { if (e.code === 1) throw e; return once(false, 20000); }
 }
 
 // Laufende Aktualisierung, solange die App offen ist.

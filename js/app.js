@@ -90,16 +90,30 @@ function dayTimes(ymd) {
 }
 
 // ---------- Standort ----------
-async function setPlace(pos, manual, knownName) {
+// Ortungen nacheinander abarbeiten, damit sich parallele Abfragen nicht überholen
+let placing = Promise.resolve(), nameFailAt = 0;
+function setPlace(pos, manual, knownName) {
+  placing = placing.then(() => applyPlace(pos, manual, knownName)).catch(e => console.warn("Standort", e));
+  return placing;
+}
+
+async function applyPlace(pos, manual, knownName) {
   const prev = state.place;
   const moved = !prev || distanceKm(prev, pos) > 1 || prev.manual !== manual;
-  if (!moved && prev.name) return;
-  let name = knownName || prev?.name || "", address = prev?.address;
-  if (moved || !name) {
-    try { const g = await reverseGeocode(pos.lat, pos.lng, L().locale); name = knownName || g.name; address = g.address; }
-    catch (e) { console.warn("Ortsname", e); }
+  // Der Name gilt nur für die Stelle, an der er zuletzt erfolgreich ermittelt wurde
+  const stale = !prev?.name || !prev.nameAt || distanceKm(prev.nameAt, pos) > 1;
+  if (!moved && !knownName && (!stale || Date.now() - nameFailAt < 60e3)) return;
+  let name = knownName || prev?.name || "", address = prev?.address, nameAt = prev?.nameAt || null;
+  try {
+    const g = await reverseGeocode(pos.lat, pos.lng, L().locale);
+    name = knownName || g.name; address = g.address; nameAt = { lat: pos.lat, lng: pos.lng };
+  } catch (e) {
+    console.warn("Ortsname", e);
+    nameFailAt = Date.now(); // in einer Minute erneut versuchen, Dienste nicht überlasten
+    if (knownName) nameAt = { lat: pos.lat, lng: pos.lng };
+    else if (!nameAt || distanceKm(nameAt, pos) > 1) name = ""; // lieber Koordinaten als einen falschen Ort zeigen
   }
-  state.place = { lat: +pos.lat.toFixed(4), lng: +pos.lng.toFixed(4), name, manual, address };
+  state.place = { lat: +pos.lat.toFixed(4), lng: +pos.lng.toFixed(4), name, manual, address, nameAt };
   save();
   await afterPlaceOrMethodChange();
 }
@@ -278,7 +292,7 @@ function render() {
   // Standort-Block
   const p = state.place;
   $("locName").textContent = p ? (p.name || `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)}`) : T("locationNone");
-  $("locState").textContent = !p ? (state.geo === "denied" ? T("locationDenied") : "") : p.manual ? T("locationManual") : T("locationAuto");
+  $("locState").textContent = !p ? (state.geo === "denied" ? T("locationDenied") : "") : p.manual ? T("locationManual") : `${T("locationAuto")} · ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
   $("locLive").hidden = !p || p.manual;
   $("btnGps").hidden = Boolean(p && !p.manual) || !geoSupported();
 

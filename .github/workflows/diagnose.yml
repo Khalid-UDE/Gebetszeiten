@@ -30,11 +30,11 @@ jobs:
           curl -s -o /dev/null -w "CORS preflight: %{http_code}\n" -X OPTIONS -H "Origin: https://khalid-ude.github.io" -H "Access-Control-Request-Method: POST" "$URL/subscribe"
           echo "== Secrets"
           npx wrangler secret list --format json | grep -o '"name": *"[A-Z_]*"' || true
-          echo "== Abos (nur Push-Dienst, Methode, Status)"
+          echo "== Abos (Push-Dienst, Gegend auf ~10 km gerundet, Methode, Status)"
           npx wrangler d1 execute gebetszeiten --remote --json --command \
-            "SELECT substr(endpoint, 9, instr(substr(endpoint, 9), '/') - 1) AS dienst, method, lang, next_key, datetime(next_at/1000,'unixepoch') AS naechste_utc, fails, datetime(updated_at/1000,'unixepoch') AS aktualisiert_utc FROM subs" || true
+            "SELECT substr(endpoint, 9, instr(substr(endpoint, 9), '/') - 1) AS dienst, round(lat, 1) AS lat, round(lng, 1) AS lng, tz, method, lang, bells, next_key, datetime(next_at/1000,'unixepoch') AS naechste_utc, datetime(sent_for/1000,'unixepoch') AS zuletzt_gesendet_utc, fails, datetime(updated_at/1000,'unixepoch') AS aktualisiert_utc FROM subs ORDER BY updated_at DESC" || true
           echo "== Letzte Fehler der Push-Dienste"
           npx wrangler d1 execute gebetszeiten --remote --json --command \
-            "SELECT datetime(t/1000,'unixepoch') AS zeit_utc, host, status, reason FROM log ORDER BY t DESC LIMIT 10" || true
+            "SELECT datetime(t/1000,'unixepoch') AS zeit_utc, host, status, reason FROM log ORDER BY t DESC LIMIT 20" || true
           echo "== Worker-Log (30 s mitschneiden)"
           timeout 30 npx wrangler tail gebetszeiten-push --format pretty || true
